@@ -85,7 +85,7 @@ while True:
             reklama.click()
             print('Реклама закрита')
         i = 1
-        while i <= 508:
+        while i <= 1:
             print(i)
             pages = driver.find_elements_by_id(f'page-{i}')
             for page in pages:
@@ -100,7 +100,26 @@ while True:
                         txt_file.write(takeLinks)
                         txt_file.write("\n")
                         txt_file.close
-                        print(takeLinks)
+                        #print(takeLinks)
+                        takeLinks = set()
+                with open("tovar.txt", "r") as fp:
+                    for line in fp.readlines():
+                        takeLinks.add(line)
+                with open("GoodUrl.txt", "a") as fp:
+                    for line in takeLinks:
+                        fp.write(line)
+                        print(line)
             i = i + 1
+        goodUrlReady = open("GoodUrl.txt", "r")
+        readyGoodUrl = goodUrlReady.readlines()
+        for link in readyGoodUrl:
+            driver.get(link)
+            applusNumber = driver.find_element_by_class_name('urun-kodu').text
+            print(f"Номер APLUS - {applusNumber}")
+            nameTovara = driver.find_element_by_class_name('urun-basligi').text
+            print(f"Назва товару - {nameTovara}")
+            elem = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr')
+            elems = len(elem)
+            sleep(1000)
     BotPars()
     sleep(1000)
