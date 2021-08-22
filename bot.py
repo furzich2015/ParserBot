@@ -4,6 +4,9 @@ import names
 import pickle
 import sqlite3
 from sqlite3 import Error
+import mysql.connector
+from getpass import getpass
+from mysql.connector import connect, Error
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -35,6 +38,8 @@ while True:
             if row == None:
                 break
             randomNameCreated = (row[0])
+        cursor.close()
+        connection.close()
 
         #Получаем абсолютний путь
         absolutePatch = os.path.abspath('./')
@@ -85,7 +90,7 @@ while True:
             reklama.click()
             print('Реклама закрита')
         i = 1
-        while i <= 1:
+        while i <= 0:
             print(i)
             pages = driver.find_elements_by_id(f'page-{i}')
             for page in pages:
@@ -110,6 +115,16 @@ while True:
                         fp.write(line)
                         print(line)
             i = i + 1
+        try:
+            with connect(
+                host="ip",
+                user="login",
+                password="password",
+            ) as connection:
+                print(connection)
+        except Error as e:
+            print(e)
+        cursor = connection.cursor()
         goodUrlReady = open("GoodUrl.txt", "r")
         readyGoodUrl = goodUrlReady.readlines()
         for link in readyGoodUrl:
@@ -118,8 +133,30 @@ while True:
             print(f"Номер APLUS - {applusNumber}")
             nameTovara = driver.find_element_by_class_name('urun-basligi').text
             print(f"Назва товару - {nameTovara}")
-            elem = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr')
-            elems = len(elem)
+            productsMarka = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[1]')
+            for productMarka in productsMarka:
+                print(productMarka.text)
+            productsModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[1]')
+            for productModel in productsModel:
+                print(productModel.text)
+            productsModeldiv2 = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[2]')
+            for productModeldiv2 in productsModeldiv2:
+                print(productModeldiv2.text)
+            productsAgeModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[3]')
+            for productAgeModel in productsAgeModel:
+                print(productAgeModel.text)
+            print("-----------------------------------------")
+            print("-----------Властивості деталі------------")
+            print("-----------------------------------------")
+            productsDetails = driver.find_elements_by_xpath('//*[@id="urun-ozellikleri-sag-kisim"]/table/tbody/tr/td')
+            for productDetails in productsDetails:
+                print(productDetails.text)
+            print("-----------------------------------------")
+            print("-----------OEM Номера товару-------------")
+            print("-----------------------------------------")
+            productsOEM = driver.find_elements_by_xpath('//*[@id="urun-oem-numaralari"]/div/div[2]')
+            for productOEM in productsOEM:
+                print(productOEM.text)
             sleep(1000)
     BotPars()
     sleep(1000)
