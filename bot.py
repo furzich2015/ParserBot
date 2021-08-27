@@ -117,46 +117,55 @@ while True:
             i = i + 1
         try:
             with connect(
-                host="ip",
-                user="login",
-                password="password",
+                host="37.46.255.251:3306",
+                user="root",
+                password="",
             ) as connection:
                 print(connection)
         except Error as e:
             print(e)
-        cursor = connection.cursor()
+        #cursor = connection.cursor()
         goodUrlReady = open("GoodUrl.txt", "r")
         readyGoodUrl = goodUrlReady.readlines()
         for link in readyGoodUrl:
             driver.get(link)
-            applusNumber = driver.find_element_by_class_name('urun-kodu').text
-            print(f"Номер APLUS - {applusNumber}")
-            nameTovara = driver.find_element_by_class_name('urun-basligi').text
-            print(f"Назва товару - {nameTovara}")
-            productsMarka = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[1]')
-            for productMarka in productsMarka:
-                print(productMarka.text)
-            productsModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[1]')
-            for productModel in productsModel:
-                print(productModel.text)
-            productsModeldiv2 = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[2]')
-            for productModeldiv2 in productsModeldiv2:
-                print(productModeldiv2.text)
-            productsAgeModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[3]')
-            for productAgeModel in productsAgeModel:
-                print(productAgeModel.text)
-            print("-----------------------------------------")
-            print("-----------Властивості деталі------------")
-            print("-----------------------------------------")
-            productsDetails = driver.find_elements_by_xpath('//*[@id="urun-ozellikleri-sag-kisim"]/table/tbody/tr/td')
-            for productDetails in productsDetails:
-                print(productDetails.text)
-            print("-----------------------------------------")
-            print("-----------OEM Номера товару-------------")
-            print("-----------------------------------------")
-            productsOEM = driver.find_elements_by_xpath('//*[@id="urun-oem-numaralari"]/div/div[2]')
-            for productOEM in productsOEM:
-                print(productOEM.text)
-            sleep(1000)
+            sleep(5)
+            parnaDetailsVisible = driver.find_element_by_xpath('//*[@id="urun-bilgileri"]/div[3]').is_displayed()
+            print(parnaDetailsVisible)
+            if parnaDetailsVisible is True:
+                parnaDetails = driver.find_elements_by_xpath('//*[@id="urun-bilgileri"]/div[3]/span/a')
+                for parnaDetailsGetText in parnaDetails:
+                    print(parnaDetailsGetText.text)
+                    continue
+            elif parnaDetailsVisible is False:
+                applusNumber = driver.find_element_by_class_name('urun-kodu').text
+                print(f"Номер APLUS - {applusNumber}")
+                nameTovara = driver.find_element_by_class_name('urun-basligi').text
+                print(f"Назва товару - {nameTovara}")
+                productsMarka = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[1]')
+                for productMarka in productsMarka:
+                    print(productMarka.text)
+                productsModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[1]')
+                for productModel in productsModel:
+                    print(productModel.text)
+                productsModeldiv2 = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td/div[2]')
+                for productModeldiv2 in productsModeldiv2:
+                    print(productModeldiv2.text)
+                productsAgeModel = driver.find_elements_by_xpath('//*[@id="urun-detaylari-sol-kisim"]/table/tbody/tr/td[3]')
+                for productAgeModel in productsAgeModel:
+                    print(productAgeModel.text)
+                print("-----------------------------------------")
+                print("-----------Властивості деталі------------")
+                print("-----------------------------------------")
+                productsDetails = driver.find_elements_by_xpath('//*[@id="urun-ozellikleri-sag-kisim"]/table/tbody/tr/td')
+                for productDetails in productsDetails:
+                    print(productDetails.text)
+                print("-----------------------------------------")
+                print("-----------OEM Номера товару-------------")
+                print("-----------------------------------------")
+                productsOEM = driver.find_elements_by_xpath('//*[@id="urun-oem-numaralari"]/div/div[2]')
+                for productOEM in productsOEM:
+                    print(productOEM.text)
+                sleep(1)
     BotPars()
     sleep(1000)
