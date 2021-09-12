@@ -78,6 +78,7 @@ while True:
             navigator.__proto__ = newProto
             """
         })
+        
         driver.get('https://www.aplus-automotive.com.ua/products?')
         checkSession = os.path.isfile('session')
         if checkSession is True:
@@ -85,35 +86,88 @@ while True:
                 driver.add_cookie(cookie)
         sleep(5)
         #takeLinks = driver.find_element_by_xpath('//*[@id="spares-table"]/tbody/tr[2]/td[1]/div/a').get_attribute("href")
+        #Перевірка на наявність реклами       
         reklama = driver.find_element_by_xpath('//*[@id="lightbox"]/div[2]/div/div[2]/a')
         if reklama.is_displayed() is True:
             reklama.click()
             print('Реклама закрита')
+        #Цикл по всім сторінкам
         i = 1
-        while i <= 0:
+        while i <= 2:
             print(i)
+            #Підставляє сторінку в адресну строку
             pages = driver.find_elements_by_id(f'page-{i}')
             for page in pages:
                 print(page)
-                page.click()
-                sleep(10)
-                #takeLinks = WebDriverWait(driver,30).until(EC.visibility_of_all_elements_located((By.CLASS_NAME,"product_details_link")))
-                takeLinks = driver.find_elements_by_class_name('product_details_link')
-                with open("tovar.txt", "a") as txt_file:
-                    for n in takeLinks:
-                        takeLinks = n.get_attribute('href')
-                        txt_file.write(takeLinks)
+                #Получаєм всі Aplus номера з сторінок
+                TakeApplusNumer = driver.find_elements_by_xpath('//*[@id="spares-table"]/tbody/tr/td[2]')
+                #Отримуєм всі Aplus номера з сторінки i
+                with open("AllAplusNumberWihtSite.txt", "a") as txt_file:
+                    for elements in TakeApplusNumer:
+                        delimetr = ''
+                        TakeApplusNumer = delimetr.join(elements.text)
+                        txt_file.write(TakeApplusNumer)
                         txt_file.write("\n")
                         txt_file.close
-                        #print(takeLinks)
-                        takeLinks = set()
-                with open("tovar.txt", "r") as fp:
-                    for line in fp.readlines():
-                        takeLinks.add(line)
-                with open("GoodUrl.txt", "a") as fp:
-                    for line in takeLinks:
-                        fp.write(line)
-                        print(line)
+                #Записуєм в файл всі Aplus номера (На данний момент перетворюється відразу в массив)
+                with open("AllAplusNumberWihtSite.txt", 'r+') as f:
+                    AllPlusNumberWihtSite = []
+                    for line in f:
+                        f.truncate(0)
+                        line.strip()
+                        tokens = line.split("\n")
+                        AllPlusNumberWihtSite.extend(tokens)
+                print(AllPlusNumberWihtSite)
+                print('-------------------------------------------')
+                #Получаем товар який потрібний, з текстового файла
+                with open("TrueTovar.txt", "r") as f:
+                    AllTrueTovarMass = []
+                    for TrueLineTovar in f:
+                        TrueLineTovar.strip()
+                        tokens = TrueLineTovar.split("\n")
+                        AllTrueTovarMass.extend(tokens)
+                print(AllTrueTovarMass)
+                #Порівняння двух масивів і знаходження однакових
+                VeryGoodTovar = set(AllPlusNumberWihtSite) & set(AllTrueTovarMass)
+                with open("FindNeedTovar.txt", "w") as txt_file:
+                    for n in VeryGoodTovar:
+                        delimetr = ''
+                        FindNeedTovar = delimetr.join(n)
+                        txt_file.write(FindNeedTovar)
+                        txt_file.write("\n")
+                        txt_file.close
+                        #print(FindNeedTovar)
+                #Записуєм в файл построчно
+                with open("FindNeedTovar.txt", 'r') as txt_file:
+                    lines = txt_file.readlines()
+                #Перезаписуєм в файл построчно, щоб убрать першу пусту строку
+                with open("FindNeedTovar.txt", 'w') as txt_file:
+                    txt_file.writelines(lines[1:])
+                #Цикл по всіх товарам, які співпали 
+                with open("FindNeedTovar.txt", 'r') as txt_file:
+                    for Tovar in txt_file:
+                        print("Товар : " + Tovar)
+                        #ТУТ ТРАБЛ! В Tovar Попадає перша строка з цикла, но елемент остається не найдем!!!
+                        #Треба пофіксить!
+                        #Код дальше 169 строкі не пускать, його треба переписать відразу під добавлення!!!
+                        SeacrhNeedTovar = driver.find_element_by_xpath('//*[@id="spares-table"]/tbody//tr//td/a[contains(text(), "' +Tovar+ '")]')
+                        if SeacrhNeedTovar.is_displayed() is True:
+                            print(f"Товар найдений: {Tovar}, на сторінці {i}")
+                            #Получаєм ссилкі на товари
+                            takeLinksNeedTovar = driver.find_elements_by_xpath('//*[@id="spares-table"]/tbody/tr/td/a')
+                            for AllLinksNeedTovar in takeLinksNeedTovar:
+                                if AllLinksNeedTovar.text == FindNeedTovar:
+                                    FindNeedTovarOK = AllLinksNeedTovar.get_attribute("href")
+                                    print(FindNeedTovarOK)
+                                with open("NeedTovarUrl.txt", "a") as txt_file:
+                                    for n in FindNeedTovarOK:
+                                        txt_file.write(n)
+                                        txt_file.write("\n")
+                                        txt_file.close
+                                        print(n)
+                    #ПЕРЕВІРКА ЧИ ТИ ПОФІКСИВ ^^
+                    print('В ТЕБЕ ПОЛУЧИЛОСЬ ПОФІКСИТЬ')
+                    sleep(100000)
             i = i + 1
         try:
             with connect(
