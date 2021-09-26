@@ -126,6 +126,13 @@ while True:
         AllPage = 509
         i = 1
         with open ("LastPage.txt", 'r') as txt_file:
+            lastPageTxtFromError = txt_file.readline()
+            lastPageTxtFromError = int(lastPageTxtFromError)
+        while i != lastPageTxtFromError:
+            pageErroe = driver.find_elements_by_id(f'page-{i}')
+            pageErroe.click()
+            i = i+1
+        with open ("LastPage.txt", 'r') as txt_file:
             lastPageTxt = txt_file.readline()
             lastPageTxt = int(lastPageTxt)
             while lastPageTxt <= 509:
