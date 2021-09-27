@@ -129,9 +129,10 @@ while True:
             lastPageTxtFromError = txt_file.readline()
             lastPageTxtFromError = int(lastPageTxtFromError)
         while i != lastPageTxtFromError:
-            pageErroe = driver.find_elements_by_id(f'page-{i}')
-            pageErroe.click()
-            i = i+1
+            pagesErroe = driver.find_elements_by_id(f'page-{i}')
+            for pageErroe in pagesErroe:
+                driver.execute_script("arguments[0].click();", pageErroe)
+                i = i+1
         with open ("LastPage.txt", 'r') as txt_file:
             lastPageTxt = txt_file.readline()
             lastPageTxt = int(lastPageTxt)
